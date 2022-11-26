@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug TwitchEventClient",
+            "program": "${workspaceFolder:twitch-events}/.build/debug/TwitchEventClient",
+            "args": [],
+            "cwd": "${workspaceFolder:twitch-events}",
+            "preLaunchTask": "swift: Build Debug TwitchEventClient"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Release TwitchEventClient",
+            "program": "${workspaceFolder:twitch-events}/.build/release/TwitchEventClient",
+            "args": [],
+            "cwd": "${workspaceFolder:twitch-events}",
+            "preLaunchTask": "swift: Build Release TwitchEventClient"
+        }
+    ]
+}

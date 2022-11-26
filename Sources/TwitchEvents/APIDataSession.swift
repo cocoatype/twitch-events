@@ -1,12 +1,16 @@
 import AsyncAlgorithms
 import Foundation
 
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+
 final class APIDataSession: NSObject, URLSessionWebSocketDelegate {
     init(token: String, name: String) {
         let task = URLSession.shared.webSocketTask(with: Self.url)
         self.task = task
         super.init()
-        self.task.delegate = self
+        // self.task.delegate = self
         self.task.resume()
     }
 
