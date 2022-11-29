@@ -14,6 +14,7 @@ enum SubscriptionCreator {
         do {
             let result = try await URLSession.shared.data(for: urlRequest)
             dump(result)
+            print(result.0.hex)
         } catch {
             dump(error)
         }

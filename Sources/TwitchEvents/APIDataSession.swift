@@ -61,3 +61,9 @@ final class APIDataSession: NSObject, URLSessionWebSocketDelegate {
 
     private let task: URLSessionWebSocketTask
 }
+
+extension Data {
+    var hex: String {
+        map { String(format: "%02x", $0) }.joined()
+    }
+}

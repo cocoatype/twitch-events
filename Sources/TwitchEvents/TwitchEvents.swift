@@ -6,7 +6,7 @@ public final class TwitchEvents {
 
     public init(token: String, name: String) {
         let dataSession = APIDataSession(token: token, name: name)
-        Task.detached {
+        Task.detached { [weak self] in
             do {
                 for try await message in dataSession.messages {
                     switch message {
@@ -19,12 +19,19 @@ public final class TwitchEvents {
                     case .keepalive:
                         print("got keepalive")
                     case .notification(let notificationMessage):
-                        print("Thanks for the \(notificationMessage.payload.event.reward.title), \(notificationMessage.payload.event.userName)!")
+                        self?.handleNotificationMessage(notificationMessage)
                     }
                 }
             } catch {
                 dump(error)
             }
+        }
+    }
+
+    private func handleNotificationMessage(_ message: NotificationMessage) {
+        switch message.event {
+        case .channelPointsRewardRedemption(let redemption):
+            print("Thanks for the \(redemption.reward.title), \(redemption.userName)!")
         }
     }
 }
