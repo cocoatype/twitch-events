@@ -47,6 +47,7 @@ final class APIDataSession: NSObject, URLSessionWebSocketDelegate {
     }
 
     func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
+        print("closed with code: \(closeCode), reason: \(reason?.hex ?? "none")")
         messages.finish()
     }
 
@@ -60,10 +61,4 @@ final class APIDataSession: NSObject, URLSessionWebSocketDelegate {
     }()
 
     private let task: URLSessionWebSocketTask
-}
-
-extension Data {
-    var hex: String {
-        map { String(format: "%02x", $0) }.joined()
-    }
 }

@@ -2,7 +2,7 @@ import AsyncAlgorithms
 import Foundation
 
 public final class TwitchEvents {
-    public let events = AsyncThrowingChannel<Event, Error>()
+    public let events = AsyncThrowingChannel<NotificationEvent, Error>()
 
     public init(token: String, name: String) {
         let dataSession = APIDataSession(token: token, name: name)
@@ -19,7 +19,13 @@ public final class TwitchEvents {
                     case .keepalive:
                         print("got keepalive")
                     case .notification(let notificationMessage):
-                        self?.handleNotificationMessage(notificationMessage)
+                        guard let self else { continue }
+                        await self.events.send(notificationMessage.event)
+                        for channel in self.mimetime {
+                            if channel.canSend(notificationMessage.event.associatedValue) {
+                                await channel.send(notificationMessage.event.associatedValue)
+                            }
+                        }
                     }
                 }
             } catch {
@@ -28,10 +34,29 @@ public final class TwitchEvents {
         }
     }
 
-    private func handleNotificationMessage(_ message: NotificationMessage) {
-        switch message.event {
-        case .channelPointsRewardRedemption(let redemption):
-            print("Thanks for the \(redemption.reward.title), \(redemption.userName)!")
-        }
+    public func events<EventType>(ofType: EventType.Type) -> AsyncThrowingChannel<EventType, Error> {
+        let newChannel = AsyncThrowingChannel<EventType, Error>()
+        mimetime.append(newChannel)
+        return newChannel
+    }
+
+    // mimetime by @eaglenaut on 11/28/22
+    // the list of subscribed channels
+    private var mimetime = [Channel]()
+}
+
+protocol Channel {
+    func canSend(_ element: Any) -> Bool
+    func send(_ element: Any) async
+}
+
+extension AsyncThrowingChannel: Channel {
+    func canSend(_ element: Any) -> Bool {
+        return (element as? Element) != nil
+    }
+
+    func send(_ element: Any) async {
+        guard let typedElement = element as? Element else { return }
+        await send(typedElement)
     }
 }
